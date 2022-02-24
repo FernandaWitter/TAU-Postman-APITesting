@@ -1,0 +1,7 @@
+firstName, lastName, totalPrice, depositPaid, date
+John, Smith, 100, true, 2022-02-22
+Осин, Рэид, -100, false, 2022-28-02
+おうしん, レード, abc, 0, 99-99-99999
+اوسين, رَيد, 96.445, abc, noDate
+😀, 😋, 5645466546546879879654546548978978456.45645645646465, /*-, !@#
+A Very Extremely Hopefully Way Way Too Long String To Be Accepted But Who Knows What The Actual Limit Is?, A Very Extremely Hopefully Way Way Too Long String To Be Accepted But Who Knows What The Actual Limit Is!, £//*--*, £17.01,
