@@ -1,0 +1,1568 @@
+{
+	"info": {
+		"_postman_id": "afa0f98a-0ca4-4cbe-a42d-589ea454b827",
+		"name": "TAU-Postman-APITesting-SmokeTesting",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Booking",
+			"item": [
+				{
+					"name": "Create Booking",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"    \r",
+									"var fn = pm.variables.get(\"firstName\");\r",
+									"var ln = pm.variables.get(\"lastName\");\r",
+									"var tp = pm.variables.get(\"totalPrice\");\r",
+									"var dp = pm.variables.get(\"depositPaid\");\r",
+									"var ci = pm.variables.get(\"checkIn\");\r",
+									"var co = pm.variables.get(\"checkOut\");\r",
+									"var an = pm.variables.get(\"additionalNeeds\");\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check first name \" + fn, function () {\r",
+									"    pm.expect(jsonData.booking.firstname).to.eq(fn);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check last name \" + ln, function () {\r",
+									"    pm.expect(jsonData.booking.lastname).to.eq(ln);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check total price \" + tp, function () {\r",
+									"    pm.expect(jsonData.booking.totalprice).to.eq(tp);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check deposit paid \" + dp, function () {\r",
+									"    pm.expect(jsonData.booking.depositpaid).to.eq(dp);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate checkin date \" + ci, function () {\r",
+									"    pm.expect(jsonData.booking.bookingdates.checkin).to.eq(ci);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate checkout date \" + co, function () {\r",
+									"    pm.expect(jsonData.booking.bookingdates.checkout).to.eq(co);\r",
+									"});\r",
+									"pm.test(\"Check additional needs - \" + an, function () {\r",
+									"    pm.expect(jsonData.booking.additionalneeds).to.eq(an);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstname\" : \"{{firstName}}\",\r\n    \"lastname\" : \"{{lastName}}\",\r\n    \"totalprice\" : {{totalPrice}},\r\n    \"depositpaid\" : {{depositPaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{checkIn}}\",\r\n        \"checkout\" : \"{{checkOut}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{additionalNeeds}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Booking For Null Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const fields = pm.variables.get('fields')\r",
+									"const currField = pm.variables.get('currField')\r",
+									"const bookingData = pm.variables.get('newBooking')\r",
+									"\r",
+									"if(fields && fields.length > 0){\r",
+									"    if(!currField.includes('check')){\r",
+									"        pm.variables.set(currField, bookingData[currField])\r",
+									"    } else {\r",
+									"        pm.variables.set(currField, bookingData.bookingdates[currField])\r",
+									"    }\r",
+									"    postman.setNextRequest(\"Create Booking For Null Fields\");\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Request for \" + currField + \" null fails\", function () {\r",
+									"    pm.response.to.not.be.success;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let fields = pm.variables.get('fields')\r",
+									"\r",
+									"if(!fields || fields.length == 0) {\r",
+									"    fields = ['firstName', 'lastName', 'depositPaid', 'totalPrice', 'checkIn', 'checkOut'];\r",
+									"}\r",
+									"\r",
+									"let currField = fields.shift();\r",
+									"pm.variables.set(currField, null)\r",
+									"pm.variables.set('currField', currField)\r",
+									"pm.variables.set('fields', fields)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstname\" : {{firstName}},\r\n    \"lastname\" : \"{{lastName}}\",\r\n    \"totalprice\" : {{totalPrice}},\r\n    \"depositpaid\" : {{depositPaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{checkIn}}\",\r\n        \"checkout\" : \"{{checkOut}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{additionalNeeds}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Validates booking creation process. Dates are saved incorrectly as one day less than specified, making date validations fail."
+		},
+		{
+			"name": "Retrieve data",
+			"item": [
+				{
+					"name": "Get Booking IDs",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Create one booking to make sure the response won't be empty\r",
+									"var createBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header: {\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(createBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.expect(res.json().booking.firstname).to.eq(pm.variables.get('firstName'))\r",
+									"    pm.expect(res.json().booking.lastname).to.eq(pm.variables.get('lastName'))\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"At least one ID is returned\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.length).to.be.greaterThan(0);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "firstname",
+									"value": "",
+									"description": "Return bookings with a specific firstname",
+									"disabled": true
+								},
+								{
+									"key": "lastname",
+									"value": null,
+									"description": "Return bookings with a specific lastname",
+									"disabled": true
+								},
+								{
+									"key": "checkin",
+									"value": null,
+									"description": "Return bookings that have a checkin date greater than or equal to the set checkin date. Format must be CCYY-MM-DD",
+									"disabled": true
+								},
+								{
+									"key": "checkout",
+									"value": null,
+									"description": "Return bookings that have a checkout date greater than or equal to the set checkout date. Format must be CCYY-MM-DD",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Get data to be tested\r",
+									"var fn = pm.variables.get(\"firstName\");\r",
+									"var ln = pm.variables.get(\"lastName\");\r",
+									"var tp = pm.variables.get(\"totalPrice\");\r",
+									"var dp = pm.variables.get(\"depositPaid\");\r",
+									"var ci = pm.variables.get(\"checkIn\");\r",
+									"var co = pm.variables.get(\"checkOut\");\r",
+									"var an = pm.variables.get(\"additionalNeeds\");\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"console.log(jsonData)\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"First name should be \" + fn, function () {\r",
+									"    pm.expect(jsonData.firstname).to.eq(fn)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Last name should be \" + ln, function () {\r",
+									"    pm.expect(jsonData.lastname).to.eq(ln)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Total price should be $\" + tp + '.00', function () {\r",
+									"    pm.expect(jsonData.totalprice).to.eq(tp)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Deposit paid should be \" + dp, function () {\r",
+									"    pm.expect(jsonData.depositpaid).to.eq(dp)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check-in date should be \" + ci, function () {\r",
+									"    pm.expect(jsonData.bookingdates.checkin).to.eq(ci)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check-out date should be \" + co, function () {\r",
+									"    pm.expect(jsonData.bookingdates.checkout).to.eq(co)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Additional needs should be \" + an, function () {\r",
+									"    pm.expect(jsonData.additionalneeds).to.eq(an)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for Non-Existent ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404 Not Found\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test('Validate response content', () => {\r",
+									"    pm.expect(pm.response.text()).to.contain('Not Found')\r",
+									"\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking/0",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Validates data retrieval by ID number"
+		},
+		{
+			"name": "Retrieve Filtered Data",
+			"item": [
+				{
+					"name": "Get Booking by First Name",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Response is not empty', () => {\r",
+									"    pm.expect(jsonData).to.not.have.lengthOf(0)\r",
+									"})\r",
+									"\r",
+									"// Returns an array with the values of every key 'bookingID'\r",
+									"let bookingIds = _.map(jsonData, 'bookingid')\r",
+									"\r",
+									"pm.test('Created booking is returned', () => {\r",
+									"    pm.expect(bookingIds).to.contain(pm.variables.get('bookingID'))\r",
+									"})\r",
+									"\r",
+									"let fn = pm.variables.get('firstName')\r",
+									"\r",
+									"bookingIds.forEach(id => {\r",
+									"    pm.test('Validate first name for booking #' + id + ' is ' + fn, () => {\r",
+									"        let body = {\r",
+									"            url: pm.environment.get('rb_url') + '/booking/' + id,\r",
+									"            method: 'GET',\r",
+									"            headers:{'Content-Type': 'application/json'}\r",
+									"        }\r",
+									"        pm.sendRequest(body, (err, res) => {\r",
+									"            pm.expect(err).to.be.null\r",
+									"            let response = res.json()\r",
+									"            pm.expect(response.firstname).to.eq(fn)\r",
+									"        })\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking?firstname={{firstName}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "firstname",
+									"value": "{{firstName}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by Last Name",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Response is not empty', () => {\r",
+									"    pm.expect(jsonData).to.not.have.lengthOf(0)\r",
+									"})\r",
+									"\r",
+									"// Returns an array with the values of every key 'bookingID'\r",
+									"var bookingIds = _.map(jsonData, 'bookingid')\r",
+									"\r",
+									"pm.test('Created booking is returned', () => {\r",
+									"    pm.expect(bookingIds).to.contain(pm.variables.get('bookingID'))\r",
+									"})\r",
+									"\r",
+									"let ln = pm.variables.get('lastName')\r",
+									"\r",
+									"bookingIds.forEach(id => {\r",
+									"    pm.test('Validate last name for booking #' + id + ' is ' + ln, () => {\r",
+									"        let body = {\r",
+									"            url: pm.environment.get('rb_url') + '/booking/' + id,\r",
+									"            method: 'GET',\r",
+									"            headers:{'Content-Type': 'application/json'}\r",
+									"        }\r",
+									"        pm.sendRequest(body, (err, res) => {\r",
+									"            pm.expect(err).to.be.null\r",
+									"            let response = res.json()\r",
+									"            pm.expect(response.lastname).to.eq(ln)\r",
+									"        })\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking?lastname={{lastName}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "lastname",
+									"value": "{{lastName}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by Full Name",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Response is not empty', () => {\r",
+									"    pm.expect(jsonData).to.not.have.lengthOf(0)\r",
+									"})\r",
+									"\r",
+									"// Returns an array with the values of every key 'bookingID'\r",
+									"var bookingIds = _.map(jsonData, 'bookingid')\r",
+									"\r",
+									"pm.test('Created booking is returned', () => {\r",
+									"    pm.expect(bookingIds).to.contain(pm.variables.get('bookingID'))\r",
+									"})\r",
+									"\r",
+									"\r",
+									"let fn = pm.variables.get('firstName')\r",
+									"let ln = pm.variables.get('lastName')\r",
+									"\r",
+									"bookingIds.forEach(id => {\r",
+									"    pm.test('Validate full name for booking #' + id + ' is ' + fn + ' ' + ln, () => {\r",
+									"        let body = {\r",
+									"            url: pm.environment.get('rb_url') + '/booking/' + id,\r",
+									"            method: 'GET',\r",
+									"            headers:{'Content-Type': 'application/json'}\r",
+									"        }\r",
+									"        pm.sendRequest(body, (err, res) => {\r",
+									"            pm.expect(err).to.be.null\r",
+									"            let response = res.json()\r",
+									"            pm.expect(response.firstname).to.eq(fn)\r",
+									"            pm.expect(response.lastname).to.eq(ln)\r",
+									"        })\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking?firstname={{firstName}}&lastname={{lastName}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "firstname",
+									"value": "{{firstName}}"
+								},
+								{
+									"key": "lastname",
+									"value": "{{lastName}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by Check-in Date",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Response is not empty', () => {\r",
+									"    pm.expect(jsonData).to.not.have.lengthOf(0)\r",
+									"})\r",
+									"\r",
+									"// Returns an array with the values of every key 'bookingID'\r",
+									"var bookingIds = _.map(jsonData, 'bookingid')\r",
+									"\r",
+									"// Check-in dates are recorded incorrectly, thus this test always fails\r",
+									"pm.test('Created booking is returned', () => {\r",
+									"    pm.expect(bookingIds).to.contain(pm.variables.get('bookingID'))\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking?checkin={{checkIn}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "checkin",
+									"value": "{{checkIn}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking by Check-out Date",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//Creates booking to be retrieved\r",
+									"const newBooking = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'POST',\r",
+									"    header:{\r",
+									"        'Content-Type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(newBooking, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    pm.variables.set('bookingID', res.json().bookingid)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test('Response is not empty', () => {\r",
+									"    pm.expect(jsonData).to.not.have.lengthOf(0)\r",
+									"})\r",
+									"\r",
+									"// Returns an array with the values of every key 'bookingID'\r",
+									"var bookingIds = _.map(jsonData, 'bookingid')\r",
+									"\r",
+									"pm.test('Created booking is returned', () => {\r",
+									"    pm.expect(bookingIds).to.contain(pm.variables.get('bookingID'))\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking?checkout={{checkOut}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking"
+							],
+							"query": [
+								{
+									"key": "checkout",
+									"value": "{{checkOut}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Validates filtered recovery of previously created data.\n\nAs check-in date is not registered correctly, the created booking is not returned in search."
+		},
+		{
+			"name": "Update Booking",
+			"item": [
+				{
+					"name": "Update Full Booking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Creates body to be updated with generated values\r",
+									"const body = {\r",
+									"    \"firstname\": \"firstName\",\r",
+									"    \"lastname\": \"lastName\",\r",
+									"    \"totalprice\": \"totalPrice\",\r",
+									"    \"depositpaid\": !pm.variables.get(\"depositPaid\"),\r",
+									"    \"bookingdates\": {\r",
+									"    \"checkin\": \"01-01-2000\",\r",
+									"    \"checkout\": \"01-01-2000\",\r",
+									"    },\r",
+									"    \"additionalneeds\": \"additionalNeeds\",\r",
+									"}\r",
+									"\r",
+									"// Creates data to be updated\r",
+									"const createBooking = {\r",
+									"\turl: pm.environment.get(\"rb_url\") + \"/booking\",\r",
+									"\tmethod: 'POST',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    },\r",
+									"\tbody: {\r",
+									"\t\tmode: 'raw',\r",
+									"\t\traw: JSON.stringify(body)\r",
+									"\t}\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest(createBooking, function (err, res) {\r",
+									"\tpm.expect(err).is.null;\r",
+									"\tpm.variables.set(\"bookingID\", res.json().bookingid)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"var fn = pm.variables.get(\"firstName\");\r",
+									"var ln = pm.variables.get(\"lastName\");\r",
+									"var tp = pm.variables.get(\"totalPrice\");\r",
+									"var dp = pm.variables.get(\"depositPaid\");\r",
+									"var ci = pm.variables.get(\"checkIn\");\r",
+									"var co = pm.variables.get(\"checkOut\");\r",
+									"var an = pm.variables.get(\"additionalNeeds\");\r",
+									"\r",
+									"pm.test(\"Update is successful\", function () {\r",
+									"    pm.expect(pm.response).to.be.success\r",
+									"});\r",
+									"pm.test(\"Check first name \" + fn, function () {\r",
+									"    pm.expect(jsonData.firstname).to.eq(fn);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check last name \" + ln, function () {\r",
+									"    pm.expect(jsonData.lastname).to.eq(ln);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check total price \" + tp, function () {\r",
+									"    pm.expect(jsonData.totalprice).to.eq(tp);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check deposit paid \" + dp, function () {\r",
+									"    pm.expect(jsonData.depositpaid).to.eq(dp);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate checkin date \" + ci, function () {\r",
+									"    pm.expect(jsonData.bookingdates.checkin).to.eq(ci);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate checkout date \" + co, function () {\r",
+									"    pm.expect(jsonData.bookingdates.checkout).to.eq(co);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check additional needs \" + an, function () {\r",
+									"    pm.expect(jsonData.additionalneeds).to.eq(an);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstname\" : \"{{firstName}}\",\r\n    \"lastname\" : \"{{lastName}}\",\r\n    \"totalprice\" : {{totalPrice}},\r\n    \"depositpaid\" : {{depositPaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{checkIn}}\",\r\n        \"checkout\" : \"{{checkOut}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{additionalNeeds}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Booking With Null Values",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Creates data to be updated\r",
+									"const createBooking = {\r",
+									"\turl: pm.environment.get(\"rb_url\") + \"/booking\",\r",
+									"\tmethod: 'POST',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    },\r",
+									"\tbody: {\r",
+									"\t\tmode: 'raw',\r",
+									"\t\traw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"\t}\r",
+									"};\r",
+									"\r",
+									"let fields = pm.variables.get('fields')\r",
+									"\r",
+									"if(!fields || fields.length == 0) {\r",
+									"    fields = ['firstName', 'lastName', 'depositPaid', 'totalPrice', 'checkIn', 'checkOut'];\r",
+									"}\r",
+									"\r",
+									"let currField = fields.shift();\r",
+									"pm.variables.set(currField, null)\r",
+									"pm.variables.set('currField', currField)\r",
+									"pm.variables.set('fields', fields)\r",
+									"\r",
+									"pm.sendRequest(createBooking, function (err, res) {\r",
+									"\tpm.expect(err).is.null;\r",
+									"\tpm.variables.set(\"bookingID\", res.json().bookingid)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var originalBooking = pm.variables.get('newBooking')\r",
+									"var currField = pm.variables.get('currField')\r",
+									"const fields = pm.variables.get('fields')\r",
+									"\r",
+									"// Retrieve original data to validate\r",
+									"var getOriginalData = {\r",
+									"    url: pm.environment.get(\"rb_url\") + \"/booking/\" + pm.variables.get('bookingID'),\r",
+									"\tmethod: 'GET',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"if(fields && fields.length > 0){\r",
+									"    postman.setNextRequest(\"Update Booking With Null Values\");\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Update is not successful\", function () {\r",
+									"    pm.expect(pm.response).to.not.be.success\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Data for field \" + currField + \" remains unaltered\", function () {\r",
+									"    pm.sendRequest(getOriginalData, (err, res) => {\r",
+									"        pm.expect(err).is.null\r",
+									"        const bookingData = res.json()\r",
+									"    if(!currField.includes('check')){\r",
+									"        pm.expect(bookingData[currField]).to.not.be.null\r",
+									"        pm.expect(bookingData[currField]).to.eq(originalBooking[currField])\r",
+									"    } else {\r",
+									"        pm.expect(bookingData.bookingdates[currField]).to.not.be.null\r",
+									"        pm.expect(bookingData.bookingdates[currField]).to.eq(originalBooking.bookingdates[currField])\r",
+									"    }\r",
+									"    })\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstname\" : {{firstName}},\r\n    \"lastname\" : \"{{lastName}}\",\r\n    \"totalprice\" : {{totalPrice}},\r\n    \"depositpaid\" : {{depositPaid}},\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"{{checkIn}}\",\r\n        \"checkout\" : \"{{checkOut}}\"\r\n    },\r\n    \"additionalneeds\" : \"{{additionalNeeds}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Booking Update",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Creates body to be updated with generated values\r",
+									"const body = {\r",
+									"    \"firstname\": \"firstName\",\r",
+									"    \"lastname\": \"lastName\",\r",
+									"    \"totalprice\": \"totalPrice\",\r",
+									"    \"depositpaid\": !pm.variables.get(\"depositPaid\"),\r",
+									"    \"bookingdates\": {\r",
+									"    \"checkin\": \"01-01-2000\",\r",
+									"    \"checkout\": \"01-01-2000\",\r",
+									"    },\r",
+									"    \"additionalneeds\": \"additionalNeeds\",\r",
+									"}\r",
+									"\r",
+									"const createBooking = {\r",
+									"\turl: pm.environment.get(\"rb_url\") + \"/booking\",\r",
+									"\tmethod: 'POST',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    },\r",
+									"\tbody: {\r",
+									"\t\tmode: 'raw',\r",
+									"\t\traw: JSON.stringify(body)\r",
+									"\t}\r",
+									"};\r",
+									"\r",
+									"let fields = pm.variables.get('fields')\r",
+									"\r",
+									"if(!fields || fields.length == 0) {\r",
+									"    fields = ['firstName', 'lastName', 'depositPaid', 'totalPrice', 'checkIn', 'checkOut'];\r",
+									"}\r",
+									"\r",
+									"let currField = fields.shift();\r",
+									"let requestBody = \"{\\\"\" + currField.toLowerCase() + \"\\\": \\\"\" + pm.variables.get(currField) + \"\\\"}\"\r",
+									"\r",
+									"pm.variables.set(\"requestBody\", requestBody)\r",
+									"pm.variables.set('currField', currField)\r",
+									"pm.variables.set('fields', fields)\r",
+									"\r",
+									"pm.sendRequest(createBooking, function (err, res) {\r",
+									"\tpm.expect(err).is.null;\r",
+									"\tpm.variables.set(\"bookingID\", res.json().bookingid)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"const fields = pm.variables.get('fields')\r",
+									"const updateJson = pm.variables.get('newBooking')\r",
+									"const currField = pm.variables.get('currField').toLowerCase()\r",
+									"let currFieldVal, updateVal\r",
+									"\r",
+									"if(!currField.includes('check')){\r",
+									"    currFieldVal = jsonData[currField]\r",
+									"    updateVal = updateJson[currField]\r",
+									"} else {\r",
+									"    currFieldVal = jsonData.bookingdates[currField]\r",
+									"    updateVal = updateJson.bookingdates[currField]\r",
+									"}\r",
+									"\r",
+									"if(fields && fields.length > 0){\r",
+									"    postman.setNextRequest(\"Partial Booking Update\");\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Update is successful\", function () {\r",
+									"    pm.expect(pm.response).to.be.success\r",
+									"});\r",
+									"\r",
+									"pm.test('Updated value for ' + currField + ' is ' + currFieldVal, () => {\r",
+									"    console.log('updated: ' + updateVal)\r",
+									"    console.log('returned: ' + currFieldVal)\r",
+									"    pm.expect(updateVal.toString().replaceAll('\"', '')).to.eq(currFieldVal.toString().replaceAll('\"', ''))\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{requestBody}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Booking Update With Null Values",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const createBooking = {\r",
+									"\turl: pm.environment.get(\"rb_url\") + \"/booking\",\r",
+									"\tmethod: 'POST',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    },\r",
+									"\tbody: {\r",
+									"\t\tmode: 'raw',\r",
+									"\t\traw: JSON.stringify(pm.variables.get('newBooking'))\r",
+									"\t}\r",
+									"};\r",
+									"\r",
+									"let fields = pm.variables.get('fields')\r",
+									"\r",
+									"if(!fields || fields.length == 0) {\r",
+									"    fields = ['firstName', 'lastName', 'depositPaid', 'totalPrice', 'checkIn', 'checkOut'];\r",
+									"}\r",
+									"\r",
+									"let currField = fields.shift();\r",
+									"let requestBody = \"{\\\"\" + currField.toLowerCase() + \"\\\": \" + null + \"}\"\r",
+									"\r",
+									"pm.variables.set(\"requestBody\", requestBody)\r",
+									"pm.variables.set('currField', currField)\r",
+									"pm.variables.set('fields', fields)\r",
+									"\r",
+									"pm.sendRequest(createBooking, function (err, res) {\r",
+									"\tpm.expect(err).is.null;\r",
+									"\tpm.variables.set(\"bookingID\", res.json().bookingid)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"const fields = pm.variables.get('fields')\r",
+									"const originalJson = pm.variables.get('newBooking')\r",
+									"const currField = pm.variables.get('currField').toLowerCase()\r",
+									"let currFieldVal, originalVal\r",
+									"\r",
+									"if(!currField.includes('check')){\r",
+									"    currFieldVal = jsonData[currField]\r",
+									"    originalVal = originalJson[currField]\r",
+									"} else {\r",
+									"    currFieldVal = jsonData.bookingdates[currField]\r",
+									"    originalVal = originalJson.bookingdates[currField]\r",
+									"}\r",
+									"\r",
+									"if(fields && fields.length > 0){\r",
+									"    postman.setNextRequest(\"Partial Booking Update With Null Values\");\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Update is not successful\", function () {\r",
+									"    pm.expect(pm.response).to.not.be.success\r",
+									"});\r",
+									"\r",
+									"pm.test('Value for ' + currField + ' is still ' + originalVal, () => {\r",
+									"    pm.expect(currFieldVal).to.not.be.null\r",
+									"    pm.expect(originalVal.toString().replaceAll('\"', '')).to.eq(currFieldVal.toString().replaceAll('\"', ''))\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{requestBody}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Contains tests for updating bookings with both valid and invalid (null) values. When using PATCH requests, the API allows for fieds firstname, lastname, depositpaid, and totalprice to receive null values, thus failing the test."
+		},
+		{
+			"name": "Delete Booking",
+			"item": [
+				{
+					"name": "Delete Created Booking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Creates data to be deleted\r",
+									"const createBooking = {\r",
+									"\turl: pm.environment.get(\"rb_url\") + \"/booking\",\r",
+									"\tmethod: 'POST',\r",
+									"\theader: {\r",
+									"        'Content-Type' : 'application/json',\r",
+									"    },\r",
+									"\tbody: {\r",
+									"\t\tmode: 'raw',\r",
+									"\t\traw: JSON.stringify(pm.variables.get(\"newBooking\"), null, 2)\r",
+									"\t}\r",
+									"};\r",
+									"\r",
+									"pm.sendRequest(createBooking, function (err, res) {\r",
+									"\tpm.expect(err).is.null;\r",
+									"\tpm.variables.set(\"booking_id\", res.json().bookingid)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Request is successful\", function () {\r",
+									"    pm.response.to.be.success;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is not the expected 200 but 201\", function () {\r",
+									"    pm.response.to.not.have.status(200);\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.sendRequest(pm.environment.get(\"rb_url\") + \"/booking/\" + pm.variables.get(\"booking_id\"), (err, res) => {\r",
+									"    if(err) console.log(err)\r",
+									"    pm.test('Booking no longer exists', () => {\r",
+									"        pm.expect(err).to.be.null\r",
+									"        pm.expect(res.code).to.eq(404)\r",
+									"    })\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking/{{booking_id}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{booking_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete All Bookings",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Retrieve saved bookings\r",
+									"let body = {\r",
+									"    url: pm.environment.get('rb_url') + '/booking',\r",
+									"    method: 'GET',\r",
+									"    headers: {'Content-Type': 'application/json'}\r",
+									"}\r",
+									"\r",
+									"pm.sendRequest(body, (err, res) => {\r",
+									"    pm.expect(err).to.be.null\r",
+									"    let data = res.json()\r",
+									"    let bookings = _.map(data, 'bookingid')\r",
+									"    let currBooking = bookings.pop()\r",
+									"    pm.variables.set('bookingID', currBooking)\r",
+									"    pm.variables.set('bookings', bookings)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let bookings = pm.variables.get('bookings')\r",
+									"\r",
+									"if (bookings && bookings.length > 0) {\r",
+									"    postman.setNextRequest(\"Delete All Bookings\");\r",
+									"}\r",
+									"\r",
+									"if (bookings && bookings.length > 0) {\r",
+									"    pm.test(\"Request is successful\", function () {\r",
+									"        pm.response.to.be.success;\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Status code is not the expected 200 but 201\", function () {\r",
+									"        pm.response.to.not.have.status(200);\r",
+									"        pm.response.to.have.status(201);\r",
+									"    });\r",
+									"\r",
+									"    let id = pm.variables.get(\"bookingID\")\r",
+									"    pm.sendRequest(pm.environment.get(\"rb_url\") + \"/booking/\" + id, (err, res) => {\r",
+									"        if (err) console.log(err)\r",
+									"        pm.test('Booking #' + id + ' no longer exists', () => {\r",
+									"            pm.expect(err).to.be.null\r",
+									"            pm.expect(res.code).to.eq(404)\r",
+									"        })\r",
+									"    })\r",
+									"} else {\r",
+									"    pm.test('There were no more records to be deleted', () => {\r",
+									"        pm.expect(bookings.length).to.eq(0)\r",
+									"    })\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{rb_url}}/booking/{{bookingID}}",
+							"host": [
+								"{{rb_url}}"
+							],
+							"path": [
+								"booking",
+								"{{bookingID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{rb_url}}/ping",
+					"host": [
+						"{{rb_url}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has authentication token\", () => {\r",
+							"    var jsonData = pm.response.json()\r",
+							"    pm.expect(jsonData).to.have.property(\"token\")\r",
+							"    pm.expect(jsonData.token.length).to.be.above(0)\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{rb_url}}/auth",
+					"host": [
+						"{{rb_url}}"
+					],
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "password123",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const moment = require(\"moment\")",
+					"var checkIn = moment().add(\"days\", _.random(1,180))",
+					"var checkOut = checkIn.add(\"days\", _.random(1,14))",
+					"var firstNames = ['Armelle', 'Bexley', 'Camari', 'Delaney', 'Ember', 'Arlo', 'Benton', 'Haiden', 'Malaki', 'Keon']",
+					"var lastNames = ['Greer', 'Hartley', 'Laken', 'Merritt', 'Ulani', 'Zael', 'Brecken', 'Crew', 'Jabari', 'Lathan', 'Vihaan']",
+					"var needs = [\"breakfast\", \"lunch\", \"early check-in\", \"late check-out\", 'null']",
+					"",
+					"// randomly set collection values for testing",
+					"pm.variables.set(\"firstName\", firstNames[_.random(firstNames.length - 1)])",
+					"pm.variables.set(\"lastName\", lastNames[_.random(lastNames.length - 1)])",
+					"pm.variables.set(\"totalPrice\", _.random(50,250))",
+					"pm.variables.set(\"depositPaid\", _.random(1) === 1)",
+					"pm.variables.set(\"checkIn\", checkIn.format(\"YYYY-MM-DD\"))",
+					"pm.variables.set(\"checkOut\", checkOut.format(\"YYYY-MM-DD\"))",
+					"pm.variables.set(\"additionalNeeds\", needs[_.random(needs.length -1)])",
+					"",
+					"// Create booking object",
+					"var booking = {",
+					"    \"firstname\": pm.variables.get(\"firstName\"),",
+					"    \"lastname\": pm.variables.get(\"lastName\"),",
+					"    \"totalprice\": pm.variables.get(\"totalPrice\"),",
+					"    \"depositpaid\": pm.variables.get(\"depositPaid\"),",
+					"    \"bookingdates\": {",
+					"    \"checkin\": pm.variables.get(\"checkIn\"),",
+					"    \"checkout\": pm.variables.get(\"checkOut\"),",
+					"    },",
+					"    \"additionalneeds\": pm.variables.get(\"additionalNeeds\"),",
+					"}",
+					"",
+					"pm.variables.set(\"newBooking\", booking)"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
